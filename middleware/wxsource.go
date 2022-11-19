@@ -74,13 +74,14 @@ func DecryptContext(c *gin.Context) {
 	fmt.Println("ctx: ", ctx)
 	ctxData := xmlCallbackComponentRecord{}
 
-	err2 := xml.Unmarshal([]byte(ctx.Data), &ctxData)
-	fmt.Println("ctx body: ", ctxData)
+	// err2 := xml.Unmarshal([]byte(ctx.Data), &ctxData)
+	// fmt.Println("ctx body: ", ctxData)
 
 	if err := binding.XML.BindBody([]byte(ctx.Data), &ctxData); err != nil {
-		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err2.Error()))
+		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	} else {
+		fmt.Println("ctx body: ", ctxData)
 		c.Set("Body", ctxData)
 		c.Next()
 	}

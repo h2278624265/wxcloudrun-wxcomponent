@@ -44,12 +44,12 @@ func DecryptReqContext(msgEncrypt string) (context *DataContext, err error) {
 		var appId string = remain[msgLen:]
 		fmt.Println("appId:", appId)
 
-		ctx := &DataContext{
+		ctx := DataContext{
 			Random: random, 
 			MsgLen: msgLen, 
 			Data: data,
 			AppId: appId,
 		}
-		return ctx, nil
+		return &ctx, nil
 	}
 }
