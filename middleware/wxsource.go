@@ -25,6 +25,8 @@ func WXSourceMiddleWare(c *gin.Context) {
 
 func DecryptContext(c *gin.Context) {
 	body, _ := ioutil.ReadAll(c.Request.Body)
+	fmt.Println("body: ", body)
+	
 	var xmlBody string
 	if err := binding.XML.BindBody(body, &xmlBody); err != nil {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
