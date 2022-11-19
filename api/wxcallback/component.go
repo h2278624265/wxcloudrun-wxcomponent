@@ -26,6 +26,7 @@ func componentHandler(c *gin.Context) {
 	// 记录到数据库
 	body, _ := ioutil.ReadAll(c.Request.Body)
 	fmt.Println("body: ", body)
+	fmt.Println("decrypt context: ", c.DecryptContext)
 	var json wxCallbackComponentRecord
 	if err := binding.JSON.BindBody(body, &json); err != nil {
 		fmt.Println("1 error:", err.Error())
