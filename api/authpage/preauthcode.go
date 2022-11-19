@@ -1,7 +1,6 @@
 package authpage
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/errno"
