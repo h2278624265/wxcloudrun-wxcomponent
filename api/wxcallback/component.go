@@ -18,7 +18,7 @@ import (
 )
 
 type wxCallbackComponentRecord struct {
-	CreateTime int64  `xml:"CreateTime json:"CreateTime"`
+	CreateTime int64  `xml:"CreateTime" json:"CreateTime"`
 	InfoType   string `xml:"InfoType" json:"InfoType"`
 }
 
@@ -28,17 +28,17 @@ func componentHandler(c *gin.Context) {
 	// fmt.Println("body: ", body)
 	decryptCtx, ok := c.Get("DecryptContext")
 	body := decryptCtx.([]byte)
-	if ok {
-		fmt.Println("decrypt context: ", body)
-	} else {
+	if !ok {
 		c.JSON(http.StatusOK, gin.H{ "ok": ok })
 		return
 	}
 	
-	var json wxCallbackComponentRecord
-	// if err := binding.JSON.BindBody(body, &json); err != nil {
-	if err := binding.XML.BindBody(body, &json); err != nil {
-		fmt.Println("1 error:", err.Error())
+	var record wxCallbackComponentRecord
+	if err := binding.JSON.BindBody(body, &record); err != nil {
+		// fmt.Println("1 error:", err.Error())
+		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
+		return
+	} else if err := binding.XML.BindBody(body, &record); err != nil {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
@@ -49,14 +49,14 @@ func componentHandler(c *gin.Context) {
 	// 	return
 	// }
 
-	fmt.Println("2 json:", json)
+	fmt.Println("record:", record)
 	r := model.WxCallbackComponentRecord{
-		CreateTime:  time.Unix(json.CreateTime, 0),
+		CreateTime:  time.Unix(record.CreateTime, 0),
 		ReceiveTime: time.Now(),
-		InfoType:    json.InfoType,
+		InfoType:    record.InfoType,
 		PostBody:    string(body),
 	}
-	if json.CreateTime == 0 {
+	if record.CreateTime == 0 {
 		r.CreateTime = time.Unix(1, 0)
 	}
 	if err := dao.AddComponentCallBackRecord(&r); err != nil {
@@ -66,7 +66,7 @@ func componentHandler(c *gin.Context) {
 
 	// 处理授权相关的消息
 	var err error
-	switch json.InfoType {
+	switch record.InfoType {
 	case "component_verify_ticket":
 		err = ticketHandler(&body)
 	case "authorized":
@@ -84,7 +84,7 @@ func componentHandler(c *gin.Context) {
 
 	// 转发到用户配置的地址
 	var proxyOpen bool
-	proxyOpen, err = proxyCallbackMsg(json.InfoType, "", "", string(body), c)
+	proxyOpen, err = proxyCallbackMsg(record.InfoType, "", "", string(body), c)
 	if err != nil {
 		log.Error(err)
 		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(err.Error()))
@@ -101,9 +101,12 @@ type ticketRecord struct {
 
 func ticketHandler(body *[]byte) error {
 	var record ticketRecord
-	if err := binding.XML.BindBody(*body, &record); err != nil {
+	if err := binding.JSON.BindBody(*body, &record); err != nil {
+		return err
+	} else if err := binding.JSON.BindBody(*body, &record); err != nil {
 		return err
 	}
+
 	log.Info("[new ticket]" + record.ComponentVerifyTicket)
 	if err := wxbase.SetTicket(record.ComponentVerifyTicket); err != nil {
 		return err
@@ -125,7 +128,10 @@ func newAuthHander(body *[]byte) error {
 	var appinfo wx.AuthorizerInfoResp
 	if err = binding.JSON.BindBody(*body, &record); err != nil {
 		return err
+	} else if err = binding.XML.BindBody(*body, &record); err != nil {
+		return err
 	}
+
 	if refreshtoken, err = queryAuth(record.AuthorizationCode); err != nil {
 		return err
 	}
@@ -189,6 +195,9 @@ func unAuthHander(body *[]byte) error {
 	var record unAuthRecord
 	var err error
 	if err = binding.JSON.BindBody(*body, &record); err != nil {
+		log.Errorf("bind err %v", err)
+		return err
+	} else if err = binding.XML.BindBody(*body, &record); err != nil {
 		log.Errorf("bind err %v", err)
 		return err
 	}
