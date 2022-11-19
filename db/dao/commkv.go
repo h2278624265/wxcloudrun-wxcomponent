@@ -116,7 +116,9 @@ func GetCommKv(key string, defaultValue string) string {
 
 // SetCommKvEncrypt 加密写
 func SetCommKvEncrypt(key string, value string) error {
-	encryptValue, err := encrypt.AesEncrypt([]byte(value), []byte(config.ServerConf.AesKey))
+	AesKeyDecode, err := base64.StdEncoding.DecodeString(config.ServerConf.AesKey + "=")
+	// encryptValue, err := encrypt.AesEncrypt([]byte(value), []byte(config.ServerConf.AesKey))
+	encryptValue, err := encrypt.AesEncrypt([]byte(value), AesKeyDecode)
 	if err != nil {
 		return err
 	}
@@ -128,13 +130,15 @@ func GetCommKvDecrypt(key string, defaultValue string) string {
 	var dbValue string
 	var encryptValue, origValue []byte
 	var err error
+	AesKeyDecode, err := base64.StdEncoding.DecodeString(config.ServerConf.AesKey + "=")
 	if dbValue = GetCommKv(key, defaultValue); dbValue == defaultValue {
 		return defaultValue
 	}
 	if encryptValue, err = base64.StdEncoding.DecodeString(dbValue); err != nil {
 		return defaultValue
 	}
-	if origValue, err = encrypt.AesDecrypt(encryptValue, []byte(config.ServerConf.AesKey)); err != nil {
+	// if origValue, err = encrypt.AesDecrypt(encryptValue, []byte(config.ServerConf.AesKey)); err != nil {
+	if origValue, err = encrypt.AesDecrypt(encryptValue, AesKeyDecode); err != nil {
 		log.Error(err.Error())
 		return defaultValue
 	}
