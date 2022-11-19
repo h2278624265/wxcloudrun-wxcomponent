@@ -11,7 +11,7 @@ import (
 
 type DataContext struct {
 	random string
-	msgLen uint32
+	msgLen int
 	data string
 	appId string
 }
@@ -20,12 +20,13 @@ func VerifyReqContext(c *gin.Context) {
 
 }
 
-func DecryptReqContext(msgEncrypt string) (random string, msgLen int32, data string, appId string) {
+func DecryptReqContext(msgEncrypt string) (context DataContext, err error) {
 	AesKeyDecode, err := base64.StdEncoding.DecodeString(config.ServerConf.AesKey + "=")
 	tmpMsg, err := base64.StdEncoding.DecodeString(msgEncrypt)
-	fullMsg, err := encrypt.AesDecrypt(tmpMsg, AesKeyDecode); err != nil {
+	var ctx DataContext
+	if fullMsg, err := encrypt.AesDecrypt(tmpMsg, AesKeyDecode); err != nil {
 		fmt.Println("fullMsg err: ", err)
-		return nil, err
+		return ctx, err
 	} else {
 		fmt.Println("fullMsg", fullMsg)
 		var random string = string(fullMsg[:16])
