@@ -10,7 +10,7 @@ import (
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
+	// "github.com/gin-gonic/gin/binding"
 )
 
 type DataContext struct {
@@ -72,21 +72,25 @@ func DecryptContext(c *gin.Context) {
 		return
 	}
 	fmt.Println("ctx: ", ctx)
-	ctxData := xmlCallbackComponentRecord{}
+
+	c.Set("Body", []byte(ctx.Data))
+	c.Next()
+
+	// ctxData := xmlCallbackComponentRecord{}
 
 	// err2 := xml.Unmarshal([]byte(ctx.Data), &ctxData)
 	// fmt.Println("ctx body: ", ctxData)
 
-	if err := binding.XML.BindBody([]byte(ctx.Data), &ctxData); err != nil {
-		fmt.Println("err: ", err.Error())
-		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
-		return
-	} else {
-		fmt.Println("ctx body infoType: ", ctxData.InfoType)
-		fmt.Println("ctx body createTime: ", ctxData.CreateTime)
-		c.Set("Body", ctxData)
-		c.Next()
-	}
+	// if err := binding.XML.BindBody([]byte(ctx.Data), &ctxData); err != nil {
+	// 	fmt.Println("err: ", err.Error())
+	// 	c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
+	// 	return
+	// } else {
+	// 	fmt.Println("ctx body infoType: ", ctxData.InfoType)
+	// 	fmt.Println("ctx body createTime: ", ctxData.CreateTime)
+	// 	c.Set("Body", ctxData)
+	// 	c.Next()
+	// }
 
 
 	// if errXml := c.ShouldBindBodyWith(&xmlBody, binding.XML); errXml == nil {
