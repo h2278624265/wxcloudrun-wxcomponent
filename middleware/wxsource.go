@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/errno"
@@ -22,5 +23,13 @@ func WXSourceMiddleWare(c *gin.Context) {
 }
 
 func DecryptContext(c *gin.Context) {
-	utils.DecryptReqContext(c)
+	body, _ := ioutil.ReadAll(c.Request.Body)
+	var xmlBody string
+	if errXml := c.ShouldBindBodyWith(&xmlBody, binding.XML); errXml == nil {
+		fmt.Println("XML body: ", xmlBody)
+		utils.DecryptReqContext(xmlBody)
+	}
+	
+
+	// body, _ := ioutil.ReadAll(c.Request.Body)
 }
