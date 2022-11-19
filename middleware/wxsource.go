@@ -13,9 +13,21 @@ import (
 	// "github.com/gin-gonic/gin/binding"
 )
 
-type xmlCallbackComponentRecord struct {
+type DataContext struct {
+	random string
+	msgLen int
+	data string
+	appId string
+}
+
+type xmlEncryptCallbackComponentRecord struct {
 	AppId string `xml:"AppId"`
 	Encrypt string `xml:"Encrypt"`
+}
+
+type xmlCallbackComponentRecord struct {
+	CreateTime int64  `xml:"CreateTime"`
+	InfoType   string `xml:"InfoType"`
 }
 
 // WXSourceMiddleWare 中间件 判断是否来源于微信
@@ -30,10 +42,22 @@ func WXSourceMiddleWare(c *gin.Context) {
 }
 
 func DecryptContext(c *gin.Context) {
+	signature := c.Query("signature")
+	timestamp := c.Query("timestamp")
+	nonce := c.Query("nonce")
+	encryptType := c.Query("encrypt_type")
+	msgSignature := c.Query("msg_signature")
+
+	fmt.Println("signature: ", signature)
+	fmt.Println("timestamp: ", timestamp)
+	fmt.Println("nonce: ", nonce)
+	fmt.Println("encrypt_type: ", encryptType)
+	fmt.Println("msg_signature: ", msgSignature)
+
 	body, _ := ioutil.ReadAll(c.Request.Body)
 	fmt.Println("body: ", body)
 
-	xmlBody := xmlCallbackComponentRecord{}
+	xmlBody := xmlEncryptCallbackComponentRecord{}
 	err := xml.Unmarshal(body, &xmlBody)
 
 	if err != nil {
@@ -41,8 +65,19 @@ func DecryptContext(c *gin.Context) {
 		return
 	}
 	// fmt.Println("XML body: ", xmlBody)
-	fmt.Println("XML body: ", xmlBody)
-	utils.DecryptReqContext(xmlBody.Encrypt)
+	ctx, err := utils.DecryptReqContext(xmlBody.Encrypt)
+
+	if err != nil {
+		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
+		return
+	}
+	fmt.Println("ctx: ", ctx)
+	// ctxData := xmlCallbackComponentRecord{}
+	// err := xml.Unmarshal(ctx.data, &ctxData)
+	// fmt.Println("ctx body: ", ctxData)
+
+	// c.Set("Body", ctxData)
+	// c.Next()
 	// if errXml := c.ShouldBindBodyWith(&xmlBody, binding.XML); errXml == nil {
 	// 	fmt.Println("XML body: ", xmlBody)
 	// 	utils.DecryptReqContext(xmlBody)

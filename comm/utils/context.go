@@ -35,13 +35,13 @@ func DecryptReqContext(msgEncrypt string) (context DataContext, err error) {
 		msgLen := BytesToInt(fullMsg[16:20])
 		fmt.Println("msgLen:", msgLen)
 
-		var data string = string(fullMsg[20:])
-		fmt.Println("data:", data)
+		var remain string = string(fullMsg[20:])
+		// fmt.Println("data:", remain)
 
-		var msg string = data[:msgLen]
-		fmt.Println("msg:", msg);
+		var data string = remain[:msgLen]
+		fmt.Println("msg:", remain);
 
-		var appId string = data[msgLen:]
+		var appId string = remain[msgLen:]
 		fmt.Println("appId:", appId)
 
 		ctx := DataContext{random, msgLen, data, appId};
