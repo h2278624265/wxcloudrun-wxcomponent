@@ -14,10 +14,10 @@ import (
 )
 
 type DataContext struct {
-	random string
-	msgLen int
-	data string
-	appId string
+	Random string
+	MsgLen int
+	Data string
+	AppId string
 }
 
 type xmlEncryptCallbackComponentRecord struct {
@@ -72,12 +72,16 @@ func DecryptContext(c *gin.Context) {
 		return
 	}
 	fmt.Println("ctx: ", ctx)
-	// ctxData := xmlCallbackComponentRecord{}
-	// err := xml.Unmarshal(ctx.data, &ctxData)
-	// fmt.Println("ctx body: ", ctxData)
+	ctxData := xmlCallbackComponentRecord{}
+	err2 := xml.Unmarshal([]byte(ctx.Data), &ctxData)
+	fmt.Println("ctx body: ", ctxData)
 
-	// c.Set("Body", ctxData)
-	// c.Next()
+	if err2 != nil {
+		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err2.Error()))
+		return
+	}
+	c.Set("Body", ctxData)
+	c.Next()
 	// if errXml := c.ShouldBindBodyWith(&xmlBody, binding.XML); errXml == nil {
 	// 	fmt.Println("XML body: ", xmlBody)
 	// 	utils.DecryptReqContext(xmlBody)
