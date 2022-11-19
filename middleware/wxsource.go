@@ -73,8 +73,8 @@ func DecryptContext(c *gin.Context) {
 	}
 	fmt.Println("ctx: ", ctx)
 
-	c.Set("Decrypt", []byte(ctx.Data))
-	c.Next()
+	c.Set("DecryptContext", []byte(ctx.Data))
+	// c.Next()
 
 	// ctxData := xmlCallbackComponentRecord{}
 

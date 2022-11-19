@@ -26,11 +26,16 @@ func componentHandler(c *gin.Context) {
 	// 记录到数据库
 	body, _ := ioutil.ReadAll(c.Request.Body)
 	fmt.Println("body: ", body)
-	decryptCtx := c.MustGet("DecryptContext").([]byte)
-	fmt.Println("decrypt context: ", c.MustGet("DecryptContext").([]byte))
+	decryptCtx, ok := c.Get("DecryptContext")
+	if ok {
+		fmt.Println("decrypt context err: ", ok)
+	} else {
+		fmt.Println("decrypt context: ", decryptCtx.([]byte))
+	}
+	
 	var json wxCallbackComponentRecord
 	// if err := binding.JSON.BindBody(body, &json); err != nil {
-	if err := binding.JSON.BindBody(decryptCtx, &json); err != nil {
+	if err := binding.JSON.BindBody(decryptCtx.([]byte), &json); err != nil {
 		fmt.Println("1 error:", err.Error())
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
