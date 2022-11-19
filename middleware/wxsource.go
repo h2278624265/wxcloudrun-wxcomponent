@@ -10,7 +10,7 @@ import (
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/utils"
 
 	"github.com/gin-gonic/gin"
-	// "github.com/gin-gonic/gin/binding"
+	"github.com/gin-gonic/gin/binding"
 )
 
 type DataContext struct {
@@ -73,15 +73,19 @@ func DecryptContext(c *gin.Context) {
 	}
 	fmt.Println("ctx: ", ctx)
 	ctxData := xmlCallbackComponentRecord{}
+
 	err2 := xml.Unmarshal([]byte(ctx.Data), &ctxData)
 	fmt.Println("ctx body: ", ctxData)
 
-	if err2 != nil {
+	if err := binding.XML.BindBody([]byte(ctx.Data), &ctxData); err != nil {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err2.Error()))
 		return
+	} else {
+		c.Set("Body", ctxData)
+		c.Next()
 	}
-	c.Set("Body", ctxData)
-	c.Next()
+
+
 	// if errXml := c.ShouldBindBodyWith(&xmlBody, binding.XML); errXml == nil {
 	// 	fmt.Println("XML body: ", xmlBody)
 	// 	utils.DecryptReqContext(xmlBody)
