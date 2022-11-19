@@ -2,7 +2,7 @@ package wxcallback
 
 import (
 	"fmt"
-	"io/ioutil"
+	// "io/ioutil"
 	"net/http"
 	"time"
 
@@ -18,28 +18,37 @@ import (
 )
 
 type wxCallbackComponentRecord struct {
-	CreateTime int64  `json:"CreateTime"`
-	InfoType   string `json:"InfoType"`
+	CreateTime int64  `xml:"CreateTime json:"CreateTime"`
+	InfoType   string `xml:"InfoType" json:"InfoType"`
 }
 
 func componentHandler(c *gin.Context) {
 	// 记录到数据库
-	body, _ := ioutil.ReadAll(c.Request.Body)
-	fmt.Println("body: ", body)
+	// body, _ := ioutil.ReadAll(c.Request.Body)
+	// fmt.Println("body: ", body)
 	decryptCtx, ok := c.Get("DecryptContext")
+	body := decryptCtx.([]byte)
 	if ok {
-		fmt.Println("decrypt context err: ", ok)
+		fmt.Println("decrypt context: ", body)
 	} else {
-		fmt.Println("decrypt context: ", decryptCtx.([]byte))
+		c.JSON(http.StatusOK, gin.H{ "ok": ok })
+		return
 	}
 	
 	var json wxCallbackComponentRecord
 	// if err := binding.JSON.BindBody(body, &json); err != nil {
-	if err := binding.XML.BindBody(decryptCtx.([]byte), &json); err != nil {
+	if err := binding.XML.BindBody(body, &json); err != nil {
 		fmt.Println("1 error:", err.Error())
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
+
+	// if err := c.ShouldBind(body, &json); err != nil {
+	// 	fmt.Println("1 error:", err.Error())
+	// 	c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
+	// 	return
+	// }
+
 	fmt.Println("2 json:", json)
 	r := model.WxCallbackComponentRecord{
 		CreateTime:  time.Unix(json.CreateTime, 0),
@@ -87,12 +96,12 @@ func componentHandler(c *gin.Context) {
 }
 
 type ticketRecord struct {
-	ComponentVerifyTicket string `json:"ComponentVerifyTicket"`
+	ComponentVerifyTicket string `xml:"ComponentVerifyTicket" json:"ComponentVerifyTicket"`
 }
 
 func ticketHandler(body *[]byte) error {
 	var record ticketRecord
-	if err := binding.JSON.BindBody(*body, &record); err != nil {
+	if err := binding.XML.BindBody(*body, &record); err != nil {
 		return err
 	}
 	log.Info("[new ticket]" + record.ComponentVerifyTicket)
@@ -103,10 +112,10 @@ func ticketHandler(body *[]byte) error {
 }
 
 type newAuthRecord struct {
-	CreateTime                   int64  `json:"CreateTime"`
-	AuthorizerAppid              string `json:"AuthorizerAppid"`
-	AuthorizationCode            string `json:"AuthorizationCode"`
-	AuthorizationCodeExpiredTime int64  `json:"AuthorizationCodeExpiredTime"`
+	CreateTime                   int64  `xml:"CreateTime" json:"CreateTime"`
+	AuthorizerAppid              string `xml:"AuthorizerAppid" json:"AuthorizerAppid"`
+	AuthorizationCode            string `xml:"AuthorizationCode" json:"AuthorizationCode"`
+	AuthorizationCodeExpiredTime int64  `xml:"AuthorizationCodeExpiredTime" json:"AuthorizationCodeExpiredTime"`
 }
 
 func newAuthHander(body *[]byte) error {
@@ -172,8 +181,8 @@ func queryAuth(authCode string) (string, error) {
 }
 
 type unAuthRecord struct {
-	CreateTime      int64  `json:"CreateTime"`
-	AuthorizerAppid string `json:"AuthorizerAppid"`
+	CreateTime      int64  `xml:"CreateTime json:"CreateTime"`
+	AuthorizerAppid string `xml:"AuthorizerAppid" json:"AuthorizerAppid"`
 }
 
 func unAuthHander(body *[]byte) error {
