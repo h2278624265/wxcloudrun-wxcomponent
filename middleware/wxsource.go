@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/errno"
+	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,4 +19,8 @@ func WXSourceMiddleWare(c *gin.Context) {
 		c.Abort()
 		c.JSON(http.StatusUnauthorized, errno.ErrNotAuthorized)
 	}
+}
+
+func DecryptContext(c *gin.Context) {
+	utils.DecryptReqContext(c)
 }

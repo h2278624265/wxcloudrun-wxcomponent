@@ -1,0 +1,17 @@
+{
+  "name": "wxcloudrun-wxcomponent",
+  "version": "2.1.0",
+  "description": "微信第三方授权管理 - 传统部署版(非官方)",
+  "main": "main.sh",
+  "config": {
+    "name": "wxcloudrun-wxcomponent",
+    "status": "dev"
+  },
+  "scripts": {
+    "start": "npm run $npm_package_config_status",
+    "stop": "pm2 delete $npm_package_config_name",
+    "dev": "main.sh",
+    "prod": "pm2 start main.sh --name $npm_package_config_name -i 1"
+  }
+}
+
