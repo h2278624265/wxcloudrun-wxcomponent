@@ -78,10 +78,12 @@ func DecryptContext(c *gin.Context) {
 	// fmt.Println("ctx body: ", ctxData)
 
 	if err := binding.XML.BindBody([]byte(ctx.Data), &ctxData); err != nil {
+		fmt.Println("err: ", err.Error())
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	} else {
-		fmt.Println("ctx body: ", ctxData)
+		fmt.Println("ctx body infoType: ", ctxData.InfoType)
+		fmt.Println("ctx body createTime: ", ctxData.CreateTime)
 		c.Set("Body", ctxData)
 		c.Next()
 	}

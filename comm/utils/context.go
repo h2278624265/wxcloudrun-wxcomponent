@@ -20,13 +20,13 @@ func VerifyReqContext(c *gin.Context) {
 
 }
 
-func DecryptReqContext(msgEncrypt string) (context *DataContext, err error) {
+func DecryptReqContext(msgEncrypt string) (context DataContext, err error) {
 	AesKeyDecode, err := base64.StdEncoding.DecodeString(config.ServerConf.AesKey + "=")
 	tmpMsg, err := base64.StdEncoding.DecodeString(msgEncrypt)
 	var ctx DataContext
 	if fullMsg, err := encrypt.AesDecrypt(tmpMsg, AesKeyDecode); err != nil {
 		fmt.Println("fullMsg err: ", err)
-		return &ctx, err
+		return ctx, err
 	} else {
 		fmt.Println("fullMsg", fullMsg)
 		var random string = string(fullMsg[:16])
@@ -50,6 +50,6 @@ func DecryptReqContext(msgEncrypt string) (context *DataContext, err error) {
 			Data: data,
 			AppId: appId,
 		}
-		return &ctx, nil
+		return ctx, nil
 	}
 }
