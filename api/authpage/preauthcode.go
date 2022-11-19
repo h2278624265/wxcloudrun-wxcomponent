@@ -12,6 +12,7 @@ import (
 
 type getPreAuthCodeReq struct {
 	ComponentAppid string `wx:"component_appid"`
+	ComponentAccessToken string `wx:"component_access_token"`
 }
 
 type getPreAuthCodeResp struct {
@@ -19,8 +20,14 @@ type getPreAuthCodeResp struct {
 }
 
 func getPreAuthCodeHandler(c *gin.Context) {
+	accessToken, tknErr := wx.GetComponentAccessToken()
+	if tknErr != nil {
+		c.JSON(http.StatusOK, errno.ErrSystemError.WithData(tknErr.Error()))
+		return
+	}
 	req := getPreAuthCodeReq{
 		ComponentAppid: wxbase.GetAppid(),
+		ComponentAccessToken: accessToken,
 	}
 	_, body, err := wx.PostWxJsonWithComponentToken("/cgi-bin/component/api_create_preauthcode", "", req)
 	if err != nil {
