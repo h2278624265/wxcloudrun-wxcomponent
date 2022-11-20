@@ -14,6 +14,7 @@ type Server struct {
 	JwtIssue      string
 	JwtExpireTime int32
 	AesKey        string
+	Token         string
 }
 
 // WxApi 配置结构体

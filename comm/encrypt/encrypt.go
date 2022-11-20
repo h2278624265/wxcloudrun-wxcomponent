@@ -5,6 +5,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/md5"
+	"crypto/sha1"
 	"encoding/hex"
 )
 
@@ -56,4 +57,10 @@ func GenerateMd5(msg string) string {
 	md5tool := md5.New()
 	md5tool.Write([]byte(msg))
 	return hex.EncodeToString(md5tool.Sum([]byte("")))
+}
+
+func GenerateSha1(msg string) string {
+	sha1tool := sha1.New()
+	sha1tool.Write([]byte(msg))
+	return hex.EncodeToString(sha1tool.Sum(nil))
 }

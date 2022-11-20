@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 	"encoding/base64"
 
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/encrypt"
@@ -16,8 +18,14 @@ type DataContext struct {
 	AppId string
 }
 
-func VerifyReqContext(c *gin.Context) {
-
+func VerifyReqContext(toSign []string, msgSignature string) ok bool {
+	// dev_msg_signature=sha1(sort(Token、timestamp、nonce, msg_encrypt))
+	toSign = append(toSign, config.ServerConf.Token)
+	toSignStr = sort.Sort(strings.Join(toSign, ""))
+	devMsgSignature = encrypt.GenerateSha1(toSignStr)
+	fmt.Println("devMsgSignature:", devMsgSignature)
+	fmt.Println("msgSignature:", msgSignature)
+	return devSigSignature == msgSignature
 }
 
 func DecryptReqContext(msgEncrypt string) (context DataContext, err error) {
@@ -25,24 +33,24 @@ func DecryptReqContext(msgEncrypt string) (context DataContext, err error) {
 	tmpMsg, err := base64.StdEncoding.DecodeString(msgEncrypt)
 	var ctx DataContext
 	if fullMsg, err := encrypt.AesDecrypt(tmpMsg, AesKeyDecode); err != nil {
-		fmt.Println("fullMsg err: ", err)
+		// fmt.Println("fullMsg err: ", err)
 		return ctx, err
 	} else {
-		fmt.Println("fullMsg", fullMsg)
+		// fmt.Println("fullMsg", fullMsg)
 		var random string = string(fullMsg[:16])
-		fmt.Println("random:", random)
+		// fmt.Println("random:", random)
 
 		msgLen := BytesToInt(fullMsg[16:20])
-		fmt.Println("msgLen:", msgLen)
+		// fmt.Println("msgLen:", msgLen)
 
 		var remain string = string(fullMsg[20:])
 		// fmt.Println("data:", remain)
 
 		var data string = remain[:msgLen]
-		fmt.Println("msg:", remain);
+		// fmt.Println("msg:", remain);
 
 		var appId string = remain[msgLen:]
-		fmt.Println("appId:", appId)
+		// fmt.Println("appId:", appId)
 
 		ctx := DataContext{
 			Random: random, 

@@ -55,8 +55,6 @@ func DecryptContext(c *gin.Context) {
 	fmt.Println("msg_signature: ", msgSignature)
 
 	body, _ := ioutil.ReadAll(c.Request.Body)
-	fmt.Println("body: ", body)
-
 	xmlBody := xmlEncryptCallbackComponentRecord{}
 	err := xml.Unmarshal(body, &xmlBody)
 
@@ -64,41 +62,18 @@ func DecryptContext(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	// fmt.Println("XML body: ", xmlBody)
-	ctx, err := utils.DecryptReqContext(xmlBody.Encrypt)
+	toSign := string[]{xmlBody.Encrypt, timestamp, nonce}
+	if ok := utils.VerifyReqContext(toSign, msgSignature); ok == false {
+		c.JSON(http.StatusUnauthorized, errno.ErrNotAuthorized)
+		return
+	}
 
+	ctx, err := utils.DecryptReqContext(xmlBody.Encrypt)
 	if err != nil {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	fmt.Println("ctx: ", ctx)
-
+	// fmt.Println("ctx: ", ctx)
 	c.Set("DecryptContext", []byte(ctx.Data))
-	// c.Request.Set("Body", []byte(ctx.Data))
 	c.Next()
-
-	// ctxData := xmlCallbackComponentRecord{}
-
-	// err2 := xml.Unmarshal([]byte(ctx.Data), &ctxData)
-	// fmt.Println("ctx body: ", ctxData)
-
-	// if err := binding.XML.BindBody([]byte(ctx.Data), &ctxData); err != nil {
-	// 	fmt.Println("err: ", err.Error())
-	// 	c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
-	// 	return
-	// } else {
-	// 	fmt.Println("ctx body infoType: ", ctxData.InfoType)
-	// 	fmt.Println("ctx body createTime: ", ctxData.CreateTime)
-	// 	c.Set("Body", ctxData)
-	// 	c.Next()
-	// }
-
-
-	// if errXml := c.ShouldBindBodyWith(&xmlBody, binding.XML); errXml == nil {
-	// 	fmt.Println("XML body: ", xmlBody)
-	// 	utils.DecryptReqContext(xmlBody)
-	// }
-	
-
-	// body, _ := ioutil.ReadAll(c.Request.Body)
 }
