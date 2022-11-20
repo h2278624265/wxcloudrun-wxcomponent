@@ -32,7 +32,9 @@ npm start
 
 1. 数据库环境变量模版在db.env.template
 
+```
 cp db.env.template db.env
+```
 
 根据实际修改db.env即可。
 
