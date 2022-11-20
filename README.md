@@ -11,19 +11,21 @@
 
 ## 使用介绍
 
-*开发模式*
+### 开发模式
 
+```shell
 ./main.sh
+```
 
-*生产模式*
+### 生产模式
 
-使用pm2管理常驻进程，启动：
+这里使用pm2管理常驻进程，查看package.json，需要先行安装pm2，启动命令：
 
+```shell
 npm start
+```
 
-也可以使用容器。
-
-*配置文件*
+### 配置文件
 
 1. 数据库环境变量模版在db.env.template
 
@@ -33,10 +35,12 @@ cp db.env.template db.env
 
 2. 修改系统配置文件comm/config/server.conf
 
+```
 AseKey=''  # 对应开发资料的 “消息加解密Key”
 Token=''   # 对应开发资料的 “消息校验Token”
 
-UseComponentAccessToken=true
+UseComponentAccessToken=true   # 改成true启用 component_access_token
+```
 
 ## License
 
