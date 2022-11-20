@@ -1,14 +1,13 @@
 package utils
 
 import (
-	"fmt"
+	// "fmt"
 	"sort"
 	"strings"
 	"encoding/base64"
 
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/encrypt"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/config"
-	// "github.com/gin-gonic/gin"
 )
 
 type DataContext struct {
@@ -24,8 +23,8 @@ func VerifyReqContext(toSign []string, msgSignature string) bool {
 	sort.Sort(sort.StringSlice(toSign))
 	toSignStr := strings.Join(toSign, "")
 	devMsgSignature := encrypt.GenerateSha1(toSignStr)
-	fmt.Println("devMsgSignature:", devMsgSignature)
-	fmt.Println("msgSignature:", msgSignature)
+	// fmt.Println("devMsgSignature:", devMsgSignature)
+	// fmt.Println("msgSignature:", msgSignature)
 	return devMsgSignature == msgSignature
 }
 
@@ -34,7 +33,6 @@ func DecryptReqContext(msgEncrypt string) (context DataContext, err error) {
 	tmpMsg, err := base64.StdEncoding.DecodeString(msgEncrypt)
 	var ctx DataContext
 	if fullMsg, err := encrypt.AesDecrypt(tmpMsg, AesKeyDecode); err != nil {
-		// fmt.Println("fullMsg err: ", err)
 		return ctx, err
 	} else {
 		// fmt.Println("fullMsg", fullMsg)

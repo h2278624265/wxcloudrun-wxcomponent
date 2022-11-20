@@ -42,17 +42,17 @@ func WXSourceMiddleWare(c *gin.Context) {
 }
 
 func DecryptContext(c *gin.Context) {
-	signature := c.Query("signature")
+	// signature := c.Query("signature")
 	timestamp := c.Query("timestamp")
 	nonce := c.Query("nonce")
-	encryptType := c.Query("encrypt_type")
+	// encryptType := c.Query("encrypt_type")
 	msgSignature := c.Query("msg_signature")
 
-	fmt.Println("signature: ", signature)
-	fmt.Println("timestamp: ", timestamp)
-	fmt.Println("nonce: ", nonce)
-	fmt.Println("encrypt_type: ", encryptType)
-	fmt.Println("msg_signature: ", msgSignature)
+	// fmt.Println("signature: ", signature)
+	// fmt.Println("timestamp: ", timestamp)
+	// fmt.Println("nonce: ", nonce)
+	// fmt.Println("encrypt_type: ", encryptType)
+	// fmt.Println("msg_signature: ", msgSignature)
 
 	body, _ := ioutil.ReadAll(c.Request.Body)
 	xmlBody := xmlEncryptCallbackComponentRecord{}
