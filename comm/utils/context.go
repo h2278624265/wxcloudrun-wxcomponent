@@ -8,7 +8,7 @@ import (
 
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/encrypt"
 	"github.com/WeixinCloud/wxcloudrun-wxcomponent/comm/config"
-	"github.com/gin-gonic/gin"
+	// "github.com/gin-gonic/gin"
 )
 
 type DataContext struct {
@@ -18,14 +18,15 @@ type DataContext struct {
 	AppId string
 }
 
-func VerifyReqContext(toSign []string, msgSignature string) ok bool {
+func VerifyReqContext(toSign []string, msgSignature string) bool {
 	// dev_msg_signature=sha1(sort(Token、timestamp、nonce, msg_encrypt))
 	toSign = append(toSign, config.ServerConf.Token)
-	toSignStr = sort.Sort(strings.Join(toSign, ""))
-	devMsgSignature = encrypt.GenerateSha1(toSignStr)
+	sort.Sort(sort.StringSlice(toSign))
+	toSignStr := strings.Join(toSign, "")
+	devMsgSignature := encrypt.GenerateSha1(toSignStr)
 	fmt.Println("devMsgSignature:", devMsgSignature)
 	fmt.Println("msgSignature:", msgSignature)
-	return devSigSignature == msgSignature
+	return devMsgSignature == msgSignature
 }
 
 func DecryptReqContext(msgEncrypt string) (context DataContext, err error) {

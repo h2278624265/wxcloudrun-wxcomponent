@@ -62,7 +62,7 @@ func DecryptContext(c *gin.Context) {
 		c.JSON(http.StatusOK, errno.ErrInvalidParam.WithData(err.Error()))
 		return
 	}
-	toSign := string[]{xmlBody.Encrypt, timestamp, nonce}
+	toSign := []string{xmlBody.Encrypt, timestamp, nonce}
 	if ok := utils.VerifyReqContext(toSign, msgSignature); ok == false {
 		c.JSON(http.StatusUnauthorized, errno.ErrNotAuthorized)
 		return
