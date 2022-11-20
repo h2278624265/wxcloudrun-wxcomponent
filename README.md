@@ -3,6 +3,7 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/WeixinCloud/wxcloudrun-wxcomponent)
 
 原项目官方文档：[微信第三方平台管理工具模版](https://github.com/WeixinCloud/wxcloudrun-wxcomponent)
+
 微信服务商文档：[服务商微管家介绍](https://developers.weixin.qq.com/doc/oplatform/Third-party_Platforms/2.0/product/management-tools.html)。
 
 ## 功能介绍
@@ -12,6 +13,8 @@
 ## 使用介绍
 
 ### 开发模式
+
+开发模式下启动：
 
 ```shell
 ./main.sh
@@ -25,7 +28,7 @@
 npm start
 ```
 
-### 配置文件
+### 配置
 
 1. 数据库环境变量模版在db.env.template
 
@@ -41,6 +44,18 @@ Token=''   # 对应开发资料的 “消息校验Token”
 
 UseComponentAccessToken=true   # 改成true启用 component_access_token
 ```
+
+3. 首次登录
+
+部署完成后，首次登录时使用数据库的用户名和密码登录管家，在“系统管理”中可以修改管理员密码。
+
+“设置Secret”中的“第三方Secret”填开发平台AppId对应的AppSecret
+
+### 测试
+
+选择“开发辅助”->“开发调试”->“在线生成Token工具”->“立即前往”
+
+如果配置正确就能获取`component_verify_ticket`和`component_access_token`
 
 ## License
 
